@@ -4,7 +4,7 @@
 >
 > 白麒麟 **四不相** 与灰麒麟 **四不遇**——两个「死不相遇」的灵魂，跨越一万年的执念与守望。
 
-本项目是一个**纯标准 C++（C++11）文字冒险游戏引擎 + 完整可玩的序章「咫尺天涯」**，零第三方依赖，跨平台（Windows / Linux / macOS）。
+本项目是一个**纯标准 C++（C++23）文字冒险游戏引擎 + 完整可玩的序章「咫尺天涯」**，零第三方依赖，跨平台（Windows / Linux / macOS）。
 
 ---
 
@@ -14,9 +14,6 @@
 huazhitumi/
 ├── CMakeLists.txt          # CMake 构建（通用）
 ├── README.md
-├── .vscode/
-│   ├── tasks.json          # VS Code 一键编译/运行任务
-│   └── launch.json         # VS Code gdb 调试配置
 ├── src/
 │   ├── main.cpp            # 程序入口
 │   ├── config.h            # 颜色、常量、角色配色（全局配置）
@@ -38,54 +35,41 @@ huazhitumi/
 
 ## 二、编译与运行
 
-> 本项目需要 **C++11** 及以上编译器。中文源码统一采用 **UTF-8 编码**。
+> 本项目需要支持 **C++23** 的编译器，以及 [CMake](https://cmake.org/) 和 [Ninja](https://ninja-build.org/)（Windows 构建脚本使用 Ninja）。中文源码统一采用 **UTF-8 编码**。
 
-### 方式 A：VS Code（推荐）
+### 方式 A：下载预编译包 (推荐)
 
-VS Code 只是编辑器，需要先装一个编译器。任选其一：
+目前仓库尚未发布预编译包。请使用下面的构建方式自行编译；发布包含预编译包的正式版本后，本节会补充下载链接与校验方式。
 
-- **MinGW-w64（GCC）**：推荐。下载 [winlibs](https://winlibs.com/) 或 [MSYS2](https://www.msys2.org/)，安装后把 `g++.exe` 所在目录加入系统 `PATH`。
-- **MSVC Build Tools**：Visual Studio 安装器 → 「使用 C++ 的桌面开发」。
+### 方式 B：PowerShell 构建脚本
 
-然后：
+在仓库根目录打开 PowerShell：
 
-1. 安装 VS Code 扩展 **C/C++**（微软官方）。
-2. 用 VS Code 打开本项目文件夹。
-3. 已提供 `.vscode/tasks.json`，直接按 `Ctrl+Shift+B`（构建），或 `F5` 调试运行。
-   - 若你用的是 MSVC 而非 g++，请改用 CMake（见方式 C）。
+```powershell
+pwsh .\build.ps1
+```
 
-> 终端建议用 **Windows Terminal**（对 UTF-8 和颜色支持最好）。旧的 `cmd.exe` 下中文/颜色可能显示不佳。
+脚本会清理并重新生成 `build/`，使用 CMake + Ninja 编译 Release 版本。运行：
 
-### 方式 B：Dev-C++
+```powershell
+.\build\huazhitumi.exe
+```
 
-Dev-C++ 自带 MinGW GCC，开箱即用。请使用较新版本（**Orwell Dev-C++ 5.11** 或 **Embarcadero Dev-C++ 6.x**）。
+首次使用前，请确认已安装 CMake、Ninja 和支持 C++23 的编译器，并将它们加入 `PATH`。
 
-1. `文件 → 新建 → 项目 → 控制台应用 → C++ 项目`，命名后确定。
-2. 删除自动生成的 `main.cpp`；把 `src/` 下的 **全部 8 个 `.cpp` 文件**（main / input / renderer / save / map / game / prologue / status）加入项目（`项目 → 添加到项目`）。
-3. **关键编码设置**：`工具 → 编译选项`，在「编译器」标签勾选「编译时加入以下命令」，填入：
-   ```
-   -std=c++11 -finput-charset=UTF-8 -fexec-charset=UTF-8
-   ```
-4. 确保源码以 UTF-8 保存（Dev-C++ 中：`文件 → 另存为`，编码选 `UTF-8`）。
-5. `执行 → 编译运行`（或按 `F11`）。
-
-> 若运行时中文显示为乱码，多半是源码被存成了 GBK/ANSI，重存为 UTF-8 再编译即可。运行窗口建议用 Windows Terminal。
-
-### 方式 C：命令行 / CMake
+### 方式 C：手动使用 CMake
 
 ```bash
-# 1) 直接 g++ 单命令编译（Windows / Linux 通用）
-g++ -std=c++11 -O2 -finput-charset=UTF-8 -fexec-charset=UTF-8 \
-    -Isrc -o huazhitumi \
-    src/main.cpp src/input.cpp src/renderer.cpp src/save.cpp src/map.cpp src/game.cpp src/prologue.cpp src/status.cpp
-
-# 2) 或用 CMake
-cmake -B build
+cmake -S . -B build -G Ninja
 cmake --build build
 ```
 
-运行：Windows 下执行 `huazhitumi.exe`，Linux/macOS 下执行 `./huazhitumi`。
+运行：
 
+- Windows：`.\build\huazhitumi.exe`
+- Linux/macOS：`./build/huazhitumi`
+
+若系统已配置 CMake 可用的编译器，但未安装 Ninja，也可以移除 `-G Ninja`，改由 CMake 根据环境选择默认生成器。
 ---
 
 ## 三、操作说明
